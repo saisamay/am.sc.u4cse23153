@@ -162,3 +162,71 @@ Notifications can be loaded only when the user scrolls or requests more data.
 - improved user experience
 # Tradeoffs
 - slightly more frontend complexity
+
+# Stage 5
+# Problems With Current Implementation
+```python
+function notify_all(student_ids: array, message: string):
+    for student_id in student_ids:
+        send_email(student_id, message)
+        save_to_db(student_id, message)
+        push_to_app(student_id, message)
+```
+# Issues
+- synchronous execution is slow
+- one failure can interrupt the process
+- email API failures are not retried
+- database and notification operations are tightly coupled
+- poor scalability for 50,000 students
+- high response time
+- no fault tolerance
+# What Happens If send_email Fails For 200 Students?
+
+Those students will not receive notifications.
+
+Without retry mechanisms:
+- notifications may be permanently lost
+- system reliability decreases
+# Improved Solution
+A queue-based asynchronous architecture should be used.
+Technologies:
+- RabbitMQ
+- Kafka
+- BullMQ
+# Revised Architecture
+1. Save notification data to database
+2. Push notification jobs into message queue
+3. Worker services process jobs asynchronously
+4. Failed jobs are retried automatically
+5. Dead-letter queue stores permanently failed job
+# Revised Pseudocode
+```python
+function notify_all(student_ids, message):
+    notification_id = save_notification(message)
+    for student_id in student_ids:
+        add_to_queue({
+            student_id,
+            notification_id,
+            message
+        })
+
+worker_process():
+    while queue_not_empty():
+        job = get_next_job()
+        try:
+            send_email(job.student_id, job.message)
+            push_to_app(job.student_id, job.message)
+            mark_success(job)
+        except Exception:
+            retry_job(job)
+```
+# Should Database Save And Email Sending Happen Together?
+No.
+# Reason
+Saving notification data and sending emails should be separated.
+# Why?
+- database operations should remain reliable
+- email APIs may fail or become slow
+- asynchronous processing improves scalability
+- failures can be retried independently
+- prevents blocking the main request flow

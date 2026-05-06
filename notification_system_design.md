@@ -230,3 +230,66 @@ Saving notification data and sending emails should be separated.
 - asynchronous processing improves scalability
 - failures can be retried independently
 - prevents blocking the main request flow
+
+
+```md
+# Stage 6
+
+## Approach
+
+The notifications are fetched from the given Notification API and ranked based on two factors:
+
+1. Notification priority type
+2. Recency of the notification
+
+The priority order used is:
+
+- Placement notifications have the highest priority
+- Result notifications have medium priority
+- Event notifications have the lowest priority
+
+Each notification is assigned a score by combining its priority weight and timestamp value. The notifications are then sorted in descending order based on this score, and the top 10 notifications are displayed to the user.
+
+---
+
+## Logic Used
+
+A weight value is assigned to every notification type:
+
+- Placement → 3
+- Result → 2
+- Event → 1
+
+The timestamp is also considered so that newer notifications appear before older ones when priorities are similar.
+
+After calculating scores for all notifications:
+- notifications are sorted
+- the top 10 highest ranked notifications are selected
+
+---
+
+## Time Complexity
+
+### Sorting Notifications
+O(n log n)
+
+### Fetching Top 10 Notifications
+O(10)
+
+---
+
+## Efficient Maintenance Of Top 10 Notifications
+
+Since new notifications may continue to arrive continuously, maintaining and sorting the complete dataset repeatedly is inefficient.
+
+A better approach would be to use a Min Heap or Priority Queue of size 10.
+
+### Advantages
+
+- faster insertion of new notifications
+- avoids sorting the entire dataset every time
+- memory efficient
+- scalable for large notification streams
+
+This approach is more suitable for real-time systems where notifications are generated frequently.
+```

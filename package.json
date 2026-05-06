@@ -1,0 +1,25 @@
+{
+  "name": "am.sc.u4cse23153",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saisamay/am.sc.u4cse23153.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/saisamay/am.sc.u4cse23153/issues"
+  },
+  "homepage": "https://github.com/saisamay/am.sc.u4cse23153#readme",
+  "dependencies": {
+    "axios": "^1.16.0",
+    "dotenv": "^17.4.2"
+  }
+}
